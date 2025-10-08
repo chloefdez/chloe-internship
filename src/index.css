@@ -149,3 +149,61 @@
 
 #section-items .sk-title { width: 58%; }  
 #section-items .sk-sub   { width: 36%; }
+
+/* ── Top Sellers skeleton ─────────────────────────────────────────── */
+#section-popular ol.author_list.loading{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  column-gap:30px;
+  row-gap:18px;
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+#section-popular ol.author_list.loading>li{
+  list-style:none!important;
+  float:none!important;
+  width:auto!important;
+  padding:0!important;
+  margin:0!important;
+}
+
+#section-popular .sk{
+  position:relative; overflow:hidden; background:#eee; border-radius:8px;
+}
+#section-popular .sk::after{
+  content:""; position:absolute; inset:0; transform:translateX(-100%);
+  background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.55) 50%,rgba(255,255,255,0) 100%);
+  animation:sk-shimmer 1.6s infinite;
+}
+
+#section-popular .ts-skel{ display:flex; align-items:center; gap:12px; min-height:56px; }
+
+#section-popular .ts-num{
+  color:#E5E5E5;          
+  font-size:14px;
+  width:28px;              
+  text-align:right;
+  margin-right:8px;
+}
+
+#section-popular .ts-avatar-wrap{ position:relative; }
+#section-popular .ts-avatar{ width:48px; height:48px; border-radius:9999px; }
+
+#section-popular .ts-badge{
+  position:absolute;
+  right:-4px;            
+  bottom:-2px;
+  width:16px; height:16px;
+  border-radius:9999px;
+  background:#8364e2;      
+  color:#fff; font-size:10px; line-height:16px;
+  text-align:center;
+  border:2px solid #fff;    
+}
+
+#section-popular .ts-text{ flex:1; }
+#section-popular .ts-line{ height:12px; border-radius:6px; margin-bottom:6px; }
+#section-popular .ts-line:last-child{ height:10px; margin-bottom:0; opacity:.95; }
+#section-popular .ts-w-28{ width:112px; }  
+#section-popular .ts-w-16{ width:64px; } 

@@ -13,3 +13,8 @@ export async function fetchNewItems(signal) {
   const res = await http.get("newItems", { signal });
   return res.data || [];
 }
+
+export async function fetchTopSellers(signal) {
+    const res = await http.get("topSellers", { signal });
+    return res.data || [];
+}
