@@ -1,51 +1,77 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import AuthorBanner from "../images/author_banner.jpg";
 import AuthorItems from "../components/author/AuthorItems";
 import AuthorImage from "../images/author_thumbnail.jpg";
-import { fetchTopSellers } from "../lib/api";
+import { fetchAuthor } from "../lib/api";
 
 export default function Author() {
-  const { id } = useParams(); 
+  const { id } = useParams();
   const location = useLocation();
   const passedSeller = location.state?.seller;
 
   const [seller, setSeller] = useState(passedSeller || null);
   const [loading, setLoading] = useState(!passedSeller);
   const [err, setErr] = useState(null);
+  const [hasFollowed, setHasFollowed] = useState(false);
+  const onToggleFollow = () => setHasFollowed((f) => !f);
 
   useEffect(() => {
-    if (passedSeller) return; 
     let alive = true;
     const c = new AbortController();
 
+    const normalize = (data, fallbackId) => {
+      const authorId = String(
+        data?.authorId ?? data?.id ?? data?.uid ?? fallbackId
+      );
+
+      const items =
+        (Array.isArray(data?.nftCollection) && data.nftCollection) ||
+        (Array.isArray(data?.items) && data.items) ||
+        [];
+
+      return {
+        id: authorId,
+        name: String(data?.authorName ?? data?.name ?? "Unknown"),
+        avatar: data?.authorImage || data?.avatar || data?.image || AuthorImage,
+        username:
+          data?.tag ||
+          data?.authorTag ||
+          data?.username ||
+          data?.handle ||
+          "@creator",
+        wallet:
+          data?.address ||
+          data?.wallet ||
+          data?.walletAddress ||
+          data?.account ||
+          "",
+        followers: data?.followers ?? 573,
+        items,
+      };
+    };
+
     (async () => {
       try {
-        setLoading(true);
         setErr(null);
-        const list = await fetchTopSellers(c.signal);
+
+        // Use passed seller when it matches the URL id
+        const passedId = passedSeller
+          ? String(passedSeller.id ?? passedSeller.authorId ?? passedSeller.uid)
+          : null;
+
+        if (passedSeller && passedId === String(id)) {
+          if (!alive) return;
+          setSeller(normalize(passedSeller, id));
+          setLoading(false);
+          return;
+        }
+
+        // Otherwise fetch
+        setLoading(true);
+        const data = await fetchAuthor(id, c.signal);
         if (!alive) return;
-        const found = (Array.isArray(list) ? list : []).find(
-          (x) => String(x.id ?? x.authorId ?? x.uid) === String(id)
-        );
-        setSeller(
-          found
-            ? {
-                id: String(found.id ?? found.authorId ?? found.uid),
-                name: String(found.authorName ?? found.name ?? "Unknown"),
-                avatar:
-                  found.authorImage ||
-                  found.avatar ||
-                  found.image ||
-                  AuthorImage,
-                username: found.username || "@creator",
-                wallet:
-                  found.wallet ||
-                  "UDHUHWudhwd78wdt7edb32uidbwyuidhg7wUHIFUHWewiqdj87dy7",
-                followers: found.followers ?? 573,
-              }
-            : null
-        );
+        setSeller(normalize(data, id));
       } catch (e) {
         if (e?.name !== "AbortError") setErr("Could not load author.");
       } finally {
@@ -59,6 +85,7 @@ export default function Author() {
     };
   }, [id, passedSeller]);
 
+  // ---- memoized view model for safe optional access ----
   const view = useMemo(() => {
     if (!seller) return null;
     return {
@@ -66,23 +93,45 @@ export default function Author() {
       name: seller.name ?? "Unknown",
       avatar: seller.avatar || AuthorImage,
       username: seller.username ?? "@creator",
-      wallet:
-        seller.wallet ??
-        "UDHUHWudhwd78wdt7edb32uidbwyuidhg7wUHIFUHWewiqdj87dy7",
+      wallet: seller.wallet ?? "",
       followers: seller.followers ?? 573,
+      items: Array.isArray(seller.items) ? seller.items : [],
     };
   }, [seller]);
 
+  const displayFollowers = (view?.followers ?? 0) + (hasFollowed ? 1 : 0);
+
   const onCopy = async () => {
     try {
-      await navigator.clipboard.writeText(view.wallet);
+      if (view?.wallet) await navigator.clipboard.writeText(view.wallet);
     } catch {}
   };
+
+  // ---- skeleton grid (matches NewItems card sizes) ----
+  const SkeletonGrid = ({ count = 8 }) => (
+    <div className="nft-grid">
+      {Array.from({ length: count }).map((_, i) => (
+        <div className="nft-card skel" key={i}>
+          <div className="nft-author">
+            <div className="nft-chip">
+              <div className="nft-author-avatar sk" />
+              <span className="nft-verified sk" />
+            </div>
+          </div>
+          <div className="nft-media skel-shimmer" />
+          <div className="nft-info">
+            <div className="skel-line w-70 skel-shimmer" />
+            <div className="skel-line w-40 skel-shimmer" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div id="wrapper">
       <div className="no-bottom no-top" id="content">
-        <div id="top"></div>
+        <div id="top" />
 
         <section
           id="profile_banner"
@@ -95,6 +144,7 @@ export default function Author() {
         <section aria-label="section">
           <div className="container">
             <div className="row">
+              {/* Header */}
               <div className="col-md-12">
                 <div className="d_profile de-flex">
                   <div className="de-flex-col">
@@ -104,19 +154,22 @@ export default function Author() {
                         alt={view?.name || "Author"}
                         onError={(e) => (e.currentTarget.src = AuthorImage)}
                       />
-                      <i className="fa fa-check"></i>
-
+                      <i className="fa fa-check" />
                       <div className="profile_name">
                         <h4>
                           {loading ? "Loading..." : view?.name}
                           {!loading && (
                             <>
                               <span className="profile_username">
-                                {view.username}
+                                {view?.username?.startsWith("@")
+                                  ? view.username
+                                  : `@${view?.username ?? ""}`}
                               </span>
-                              <span id="wallet" className="profile_wallet">
-                                {view.wallet}
-                              </span>
+                              {view?.wallet && (
+                                <span id="wallet" className="profile_wallet">
+                                  {view.wallet}
+                                </span>
+                              )}
                               <button
                                 id="btn_copy"
                                 title="Copy Text"
@@ -134,22 +187,37 @@ export default function Author() {
                   <div className="profile_follow de-flex">
                     <div className="de-flex-col">
                       <div className="profile_follower">
-                        {loading ? "…" : `${view.followers} followers`}
+                        {loading ? "…" : `${displayFollowers} followers`}
                       </div>
-                      <Link to="#" className="btn-main">
-                        Follow
-                      </Link>
+                      <button
+                        type="button"
+                        className="btn-main"
+                        onClick={onToggleFollow}
+                        aria-pressed={hasFollowed}
+                      >
+                        {hasFollowed ? "Unfollow" : "Follow"}
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
 
+              {/* Items grid */}
               <div className="col-md-12">
                 <div className="de_tab tab_simple">
-                  <AuthorItems authorId={id} />
+                  {loading ? (
+                    <SkeletonGrid count={8} />
+                  ) : (
+                    <AuthorItems
+                      authorId={view?.id}
+                      items={view?.items || []}
+                      author={view}
+                    />
+                  )}
                 </div>
               </div>
 
+              {/* Error */}
               {!loading && !view && (
                 <div className="col-md-12" style={{ color: "#e74c3c" }}>
                   {err || "Author not found."}
