@@ -3,19 +3,20 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import AuthorBanner from "../images/author_banner.jpg";
 import AuthorItems from "../components/author/AuthorItems";
 import AuthorImage from "../images/author_thumbnail.jpg";
-import { fetchTopSellers } from "../lib/api";
+import { fetchAuthor } from "../lib/api";
 
 export default function Author() {
-  const { id } = useParams(); 
+  const { id: authorId } = useParams();
   const location = useLocation();
-  const passedSeller = location.state?.seller;
+  const passedSeller = location.state?.seller || null;
 
   const [seller, setSeller] = useState(passedSeller || null);
   const [loading, setLoading] = useState(!passedSeller);
   const [err, setErr] = useState(null);
 
   useEffect(() => {
-    if (passedSeller) return; 
+    if (passedSeller) return;
+
     let alive = true;
     const c = new AbortController();
 
@@ -23,31 +24,12 @@ export default function Author() {
       try {
         setLoading(true);
         setErr(null);
-        const list = await fetchTopSellers(c.signal);
+        const data = await fetchAuthor(authorId, c.signal);
         if (!alive) return;
-        const found = (Array.isArray(list) ? list : []).find(
-          (x) => String(x.id ?? x.authorId ?? x.uid) === String(id)
-        );
-        setSeller(
-          found
-            ? {
-                id: String(found.id ?? found.authorId ?? found.uid),
-                name: String(found.authorName ?? found.name ?? "Unknown"),
-                avatar:
-                  found.authorImage ||
-                  found.avatar ||
-                  found.image ||
-                  AuthorImage,
-                username: found.username || "@creator",
-                wallet:
-                  found.wallet ||
-                  "UDHUHWudhwd78wdt7edb32uidbwyuidhg7wUHIFUHWewiqdj87dy7",
-                followers: found.followers ?? 573,
-              }
-            : null
-        );
+        setSeller(data?.author ?? data ?? null);
       } catch (e) {
-        if (e?.name !== "AbortError") setErr("Could not load author.");
+        if (!alive) return;
+        setErr(e?.message || "Failed to load author");
       } finally {
         if (alive) setLoading(false);
       }
@@ -57,7 +39,7 @@ export default function Author() {
       alive = false;
       c.abort();
     };
-  }, [id, passedSeller]);
+  }, [authorId, passedSeller]);
 
   const view = useMemo(() => {
     if (!seller) return null;
@@ -75,7 +57,7 @@ export default function Author() {
 
   const onCopy = async () => {
     try {
-      await navigator.clipboard.writeText(view.wallet);
+      if (view?.wallet) await navigator.clipboard.writeText(view.wallet);
     } catch {}
   };
 
@@ -109,7 +91,7 @@ export default function Author() {
                       <div className="profile_name">
                         <h4>
                           {loading ? "Loading..." : view?.name}
-                          {!loading && (
+                          {!loading && view && (
                             <>
                               <span className="profile_username">
                                 {view.username}
@@ -134,7 +116,7 @@ export default function Author() {
                   <div className="profile_follow de-flex">
                     <div className="de-flex-col">
                       <div className="profile_follower">
-                        {loading ? "…" : `${view.followers} followers`}
+                        {loading ? "…" : `${view?.followers ?? 0} followers`}
                       </div>
                       <Link to="#" className="btn-main">
                         Follow
@@ -146,7 +128,7 @@ export default function Author() {
 
               <div className="col-md-12">
                 <div className="de_tab tab_simple">
-                  <AuthorItems authorId={id} />
+                  <AuthorItems authorId={authorId} />
                 </div>
               </div>
 

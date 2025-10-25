@@ -18,3 +18,9 @@ export async function fetchTopSellers(signal) {
     const res = await http.get("topSellers", { signal });
     return res.data || [];
 }
+
+export async function fetchAuthor(authorId, signal) {
+  if (!authorId) throw new Error("authorId is required");
+  const res = await http.get(`author?authorId=${authorId}`, { signal });
+  return res.data || null;
+}
