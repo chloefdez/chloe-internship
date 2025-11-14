@@ -135,16 +135,21 @@ const HotCollections = () => {
             ) : (
               <Slider {...settings} className="hot-collections-slider">
                 {items.map((item, i) => {
-                  const id = item?.id ?? i;
+                  const nftId = String(
+                    item?.nftId ?? item?.id ?? item?.itemId ?? i
+                  );
                   const img = item?.nftImage || item?.nft || item?.image;
+                  const authorId = item?.authorId ?? item?.author?.id ?? "";
                   const authorImg = item?.authorImage || item?.author?.avatar;
                   const title = item?.name || item?.title || "Untitled";
                   const token = item?.code || item?.token || "ERC-192";
+
                   return (
-                    <div key={id} className="slide-gutter">
+                    <div key={nftId} className="slide-gutter">
                       <div className="nft_coll">
+                        {/* image links to item details */}
                         <div className="nft_wrap">
-                          <Link to={`/item-details/${id}`}>
+                          <Link to={`/item-details/${nftId}`}>
                             <img
                               src={img}
                               className="lazy img-fluid"
@@ -152,8 +157,10 @@ const HotCollections = () => {
                             />
                           </Link>
                         </div>
+
+                        {/* author link */}
                         <div className="nft_coll_pp">
-                          <Link to={`/author/${item?.authorId || ""}`}>
+                          <Link to={`/author/${authorId}`}>
                             <img
                               className="lazy pp-coll"
                               src={authorImg}
@@ -162,8 +169,10 @@ const HotCollections = () => {
                           </Link>
                           <i className="fa fa-check"></i>
                         </div>
+
+                        {/* title also links to item details */}
                         <div className="nft_coll_info">
-                          <Link to="/explore">
+                          <Link to={`/item-details/${nftId}`}>
                             <h4>{title}</h4>
                           </Link>
                           <span>{token}</span>
