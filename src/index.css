@@ -10,3 +10,231 @@
 @import "./css/styles/style.css";
 @import "./css/colors/scheme-01.css";
 @import "./css/styles/coloring.css";
+
+/* =========================
+   Slider polish (gutters, arrows, hover extras)
+   ========================= */
+:root { --slider-gutter: 1.5px; }
+
+#section-collections .hot-collections-slider .slick-list,
+#section-items .new-items-slider .slick-list {
+  margin: 0 calc(var(--slider-gutter) * -1);
+}
+#section-collections .hot-collections-slider .slick-slide > div,
+#section-collections .hot-collections-slider .slide-gutter,
+#section-items .new-items-slider .slick-slide > div,
+#section-items .new-items-slider .slide-gutter {
+  padding: 0 var(--slider-gutter);
+}
+#section-collections .hot-collections-slider .slick-prev:before,
+#section-collections .hot-collections-slider .slick-next:before,
+#section-items .new-items-slider .slick-prev:before,
+#section-items .new-items-slider .slick-next:before { content: none !important; }
+#section-collections .hot-collections-slider .slick-prev,
+#section-collections .hot-collections-slider .slick-next,
+#section-items .new-items-slider .slick-prev,
+#section-items .new-items-slider .slick-next {
+  display: flex !important; align-items: center; justify-content: center;
+  padding: 0; line-height: 1; box-sizing: border-box;
+}
+
+/* keep legacy hover extras for cards */
+#section-items .nft__item_wrap .nft__item_extra,
+#section-collections .nft__item_wrap .nft__item_extra {
+  opacity: 0 !important; pointer-events: none; transform: translateY(6px); transition: none !important; z-index: 2;
+}
+#section-items .nft__item:hover .nft__item_wrap .nft__item_extra,
+#section-collections .nft__item:hover .nft__item_wrap .nft__item_extra {
+  opacity: 1 !important; pointer-events: auto; transform: translateY(0);
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+/* =========================
+   Global skeletons
+   ========================= */
+.sk { position: relative; overflow: hidden; background: #eee; border-radius: 8px; }
+.sk::after {
+  content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.6) 50%, rgba(255,255,255,0) 100%);
+  animation: sk-shimmer 1.2s infinite;
+}
+@keyframes sk-shimmer { 100% { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .sk::after { animation: none; } }
+
+.sk-avatar { width: 40px; height: 40px; border-radius: 50%; }
+.sk-img { width: 100%; padding-top: 100%; border-radius: 12px; }
+.sk-title { height: 18px; width: 60%; margin-top: 12px; border-radius: 6px; }
+.sk-sub { height: 14px; width: 40%; margin-top: 8px; border-radius: 6px; }
+.sk-pill { height: 28px; width: 110px; border-radius: 9999px; }
+
+.nft__item .sk-img { margin-top: 8px; }
+.nft__item .sk-title, .nft__item .sk-sub { margin-left: 4px; }
+#filter-items:disabled { opacity: .6; cursor: not-allowed; }
+
+/* =========================
+   Section skeleton sizing (New Items & Hot Collections)
+   ========================= */
+#section-collections .sk-img, #section-items .sk-img {
+  width: 100%; aspect-ratio: 16 / 10; border-radius: 12px 12px 0 0;
+}
+#section-collections .sk-avatar, #section-items .sk-avatar {
+  width: 52px; height: 52px; border-radius: 9999px; margin-top: -26px; border: 4px solid #fff;
+}
+#section-collections .sk-title, #section-items .sk-title {
+  height: 16px; width: 60%; margin: 10px auto 8px; border-radius: 6px;
+}
+#section-collections .sk-sub, #section-items .sk-sub {
+  height: 12px; width: 40%; margin: 0 auto 12px; border-radius: 6px; opacity: .9;
+}
+
+/* New Items specific skeleton spacing */
+#section-items .sk-img { aspect-ratio: 4 / 3; border-radius: 12px; }
+#section-items .sk-avatar { margin-top: 0; }
+#section-items .sk-title { margin: 14px auto 8px; width: 58%; }
+#section-items .sk-sub { margin: 0 auto 14px; width: 36%; }
+#section-items .nft__item_info { text-align: left; }
+#section-items .sk-title, #section-items .sk-sub { margin-left: 0; margin-right: 0; }
+
+/* =========================
+   Top Sellers skeletons
+   ========================= */
+#section-popular ol.author_list.loading {
+  display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 30px; row-gap: 18px; list-style: none; margin: 0; padding: 0;
+}
+#section-popular ol.author_list.loading > li {
+  list-style: none !important; float: none !important; width: auto !important;
+  padding: 0 !important; margin: 0 !important;
+}
+#section-popular .sk { position: relative; overflow: hidden; background: #eee; border-radius: 8px; }
+#section-popular .sk::after {
+  content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.55) 50%, rgba(255,255,255,0) 100%);
+  animation: sk-shimmer 1.6s infinite;
+}
+#section-popular .ts-skel { display: flex; align-items: center; gap: 12px; min-height: 56px; }
+#section-popular .ts-num { color: #E5E5E5; font-size: 14px; width: 28px; text-align: right; margin-right: 8px; }
+#section-popular .ts-avatar-wrap { position: relative; }
+#section-popular .ts-avatar { width: 48px; height: 48px; border-radius: 9999px; }
+#section-popular .ts-badge {
+  position: absolute; right: -4px; bottom: -2px; width: 16px; height: 16px; border-radius: 9999px;
+  background: #8364e2; color: #fff; font-size: 10px; line-height: 16px; text-align: center; border: 2px solid #fff;
+}
+#section-popular .ts-text { flex: 1; }
+#section-popular .ts-line { height: 12px; border-radius: 6px; margin-bottom: 6px; }
+#section-popular .ts-line:last-child { height: 10px; margin-bottom: 0; opacity: .95; }
+#section-popular .ts-w-28 { width: 112px; }
+#section-popular .ts-w-16 { width: 64px; }
+
+/* =========================
+   Dark mode adjustment for skeleton shimmer
+   ========================= */
+@media (prefers-color-scheme: dark) {
+  .sk { background: #2a2a2a; }
+  .sk::after {
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.15) 50%, rgba(255,255,255,0) 100%);
+  }
+}
+
+/* =========================
+   Reusable helpers (grid, generic card, media/info)
+   ========================= */
+.nft-grid {
+  display: grid; gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  align-items: start;
+}
+
+.nft-card {
+  position: relative; display: flex; flex-direction: column; height: 330px;
+  border: 1px solid #eceff3; border-radius: 16px; background: #fff; overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16,24,40,0.04); transition: transform .12s ease;
+}
+.nft-card:hover { transform: translateY(-2px); }
+.nft-card a { text-decoration: none; color: inherit; }
+
+.nft-author { position: absolute; top: 10px; left: 10px; z-index: 2; }
+.nft-chip { position: relative; display: inline-block; line-height: 0; }
+.nft-author-avatar {
+  width: 36px; height: 36px; border-radius: 999px; border: 2px solid #fff;
+  box-shadow: 0 1px 2px rgba(16,24,40,0.1); display: block;
+}
+.nft-verified {
+  position: absolute; right: -2px; bottom: -2px; width: 16px; height: 16px; border-radius: 9999px;
+  background: #8364e2; color: #fff; font-size: 10px; line-height: 16px; text-align: center; border: 2px solid #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+.nft-media { position: relative; width: 100%; height: 170px; background: #f5f7fb; }
+.nft-media img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+  border-top-left-radius: 16px; border-top-right-radius: 16px;
+}
+.nft-info { flex: 1; padding: 12px 14px 14px; display: flex; flex-direction: column; }
+.nft-title {
+  margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #111827;
+  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;
+}
+.nft-meta { margin-top: auto; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #6b7280; }
+.nft-price { font-weight: 600; color: #111827; }
+
+.skel .nft-media { background: #f1f4f8; }
+.skel-line { height: 12px; border-radius: 6px; background: #eef2f6; margin-top: 10px; }
+.skel-line.w-70 { width: 70%; }
+.skel-line.w-40 { width: 40%; }
+.skel-shimmer { position: relative; overflow: hidden; }
+.skel-shimmer::before {
+  content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.55) 50%, rgba(255,255,255,0) 100%);
+  animation: skel 1.2s infinite;
+}
+@keyframes skel { 100% { transform: translateX(100%); } }
+.nft__item { position: relative; } /* legacy hook */
+
+/* =========================
+   Author tiles (match New Items + preserve image aspect)
+   ========================= */
+.author-grid.newitems-look {
+  display: grid; gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  align-items: start;
+}
+.author-grid.newitems-look .nft__item {
+  position: relative; border: 1px solid #eceff3; border-radius: 12px; background: #fff; overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16,24,40,0.04), 0 8px 20px rgba(16,24,40,0.04);
+  transition: transform .12s ease;
+}
+.author-grid.newitems-look .nft__item:hover { transform: translateY(-2px); }
+
+/* stage */
+.author-grid.newitems-look .nft__item_wrap {
+  position: relative; overflow: hidden; background: transparent !important;
+  border-top-left-radius: 12px; border-top-right-radius: 12px;
+  aspect-ratio: 4 / 3;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* anchor + image centering */
+.author-grid.newitems-look .nft__item_wrap > a {
+  display: inline-flex !important; align-items: center; justify-content: center;
+  width: auto !important; height: auto !important; max-width: 100%; max-height: 100%;
+}
+.author-grid.newitems-look .nft__item_wrap > a > img.nft__item_preview {
+  max-width: 100%; max-height: 100%; width: auto; height: auto;
+  object-fit: contain; object-position: center; display: block; border-radius: 8px;
+}
+
+/* info + avatar sizing */
+.author-grid.newitems-look .nft__item_info { padding: 12px 16px 16px; }
+.author-grid.newitems-look .author_list_pp img {
+  width: 52px; height: 52px; border-radius: 9999px; border: 4px solid #fff;
+}
+
+/* keep hover extras working on author tiles */
+.author-grid.newitems-look .nft__item_wrap .nft__item_extra {
+  opacity: 0 !important; pointer-events: none; transform: translateY(6px); transition: none !important;
+}
+.author-grid.newitems-look .nft__item:hover .nft__item_wrap .nft__item_extra {
+  opacity: 1 !important; pointer-events: auto; transform: translateY(0);
+  transition: opacity .18s ease, transform .18s ease;
+}
