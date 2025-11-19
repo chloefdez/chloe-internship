@@ -158,7 +158,13 @@ const NewItems = () => {
 
   return (
     <section id="section-items" className="no-bottom">
-      <div className="container">
+      <div
+        className="container"
+        data-aos="fade-up"
+        data-aos-delay="0"
+        data-aos-duration="900"
+      >
+        {" "}
         <div className="row">
           {/* header */}
           <div className="col-lg-12">

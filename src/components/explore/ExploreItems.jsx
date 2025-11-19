@@ -149,7 +149,14 @@ export default function ExploreItems() {
           it?.ending ?? it?.expiry ?? it?.expiryDate ?? it?.endingAt ?? null;
 
         return (
-          <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12" key={id}>
+          <div
+            className="col-lg-3 col-md-6 col-sm-6 col-xs-12"
+            key={id}
+            data-aos="fade-up"
+            data-aos-duration="900"
+            data-aos-delay={i * 50}
+            data-aos-easing="ease-out-cubic"
+          >
             <div className="nft__item">
               {endAt ? <Countdown end={endAt} /> : null}
 
